@@ -1,12 +1,11 @@
 import { Logger } from '@nestjs/common';
 import { JwtFromRequestFunction } from 'passport-jwt';
-import { Strategy } from "passport-strategy";
-import { Request } from "express";
-import { FirebaseAuthStrategyOptions } from './interface/options.interface';
+import { Strategy } from 'passport-strategy';
+import { Request } from 'express';
+import { FirebaseAuthStrategyOptions } from './interface';
 import { UNAUTHORIZED, FIREBASE_AUTH } from './constants';
 import { FirebaseUser } from './user.type';
 import * as admin from 'firebase-admin';
-
 
 export class FirebaseAuthStrategy extends Strategy {
   readonly name = FIREBASE_AUTH;
@@ -19,7 +18,9 @@ export class FirebaseAuthStrategy extends Strategy {
     super();
 
     if (!options.extractor) {
-      throw new Error('\n Extractor is not a function. You should provide an extractor. \n Read the docs: https://github.com/tfarras/nestjs-firebase-auth#readme');
+      throw new Error(
+        '\n Extractor is not a function. You should provide an extractor. \n Read the docs: https://github.com/tfarras/nestjs-firebase-auth#readme',
+      );
     }
 
     this.extractor = options.extractor;
@@ -39,14 +40,14 @@ export class FirebaseAuthStrategy extends Strategy {
     }
 
     try {
-      admin.auth()
+      admin
+        .auth()
         .verifyIdToken(idToken)
         .then((res) => this.validateDecodedIdToken(res))
         .catch((err) => {
           this.fail({ err }, 401);
         });
-    }
-    catch (e) {
+    } catch (e) {
       this.logger.error(e);
 
       this.fail(e, 401);
